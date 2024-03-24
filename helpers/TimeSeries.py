@@ -30,7 +30,7 @@ def construct_lts_from_tokens(token_words: List[str]) -> List[int]:
     return lts
 
 
-def construct_its(time_series: List[int]) -> List[int]:
+def construct_its(time_series: List[int]) -> List[float]:
     """
     :param time_series:
     :return:
