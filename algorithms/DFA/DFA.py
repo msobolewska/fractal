@@ -15,7 +15,7 @@ def divide_into_segments(data: List[float], segment_size: int) -> List[List[floa
     return segments
 
 
-def calculate_local_trend(segment: List[int]) -> List[float]:
+def calculate_local_trend(segment: List[float]) -> List[float]:
     """
     :param segment:
     :return:
@@ -23,8 +23,6 @@ def calculate_local_trend(segment: List[int]) -> List[float]:
     x = np.arange(len(segment))
     slope, intercept, _, _, _ = linregress(x, segment)
     trend_line = slope * x + intercept
-    print(x)
-    print(segment)
     return trend_line
 
 
@@ -150,7 +148,7 @@ def plot_segments(original_time_series: List[int], segments: List[List[float]], 
     len_segment_flattened = len(segments_flattened)
     x_axis = list(range(0, len_segment_flattened))
 
-    fig, axs = plt.subplots(3)
+    fig, axs = plt.subplots(3) # TODO podpisac osie
 
     axs[0].scatter(x_axis, original_time_series[0:len_segment_flattened])
     axs[0].set_title('Time series')
