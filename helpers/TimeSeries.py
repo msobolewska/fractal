@@ -39,3 +39,22 @@ def construct_its(time_series: List[int]) -> List[float]:
     integrated_time_series = np.cumsum(time_series - mean_value)
     return integrated_time_series
 
+
+def construct_its_from_normalized_ts(time_series: List[float]) -> List[float]:
+    """
+    :param time_series:
+    :return:
+    """
+    integrated_time_series = np.cumsum(time_series)
+    return integrated_time_series
+
+
+def normalize(time_series: List[int]) -> List[float]:
+    """
+    :param time_series:
+    :return:
+    """
+    mean_value = np.mean(time_series)
+    sigma = np.sqrt(np.mean(np.dot(time_series, time_series) - mean_value * mean_value))
+    normalized_time_series = (time_series - mean_value) / sigma
+    return normalized_time_series
