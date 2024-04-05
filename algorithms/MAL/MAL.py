@@ -3,6 +3,8 @@ from typing import List
 import numpy as np
 import statistics
 
+from scipy.optimize import curve_fit
+
 from helpers.TextManipulations import tokenize_text_merge_meaningless, split_into_syllables, split_into_phonemes
 
 syllables_length_in_word_dict = {}
@@ -123,3 +125,25 @@ def print_sorted(dict_in: {}) -> None:
     print("-" * 15)
     for key, value in sorted_dict.items():
         print(f"{key}\t{value}")
+
+
+def model_func(x, a, b):
+    """
+    :param x:
+    :param a:
+    :param b:
+    :return:
+    """
+    return a * pow(x, -b)
+
+
+def find_A_b_numerically(X_Y: {}) -> {float, float}:
+    """
+    :param X_Y:
+    :return:
+    """
+    x_data = list(X_Y.keys())
+    y_data = list(X_Y.values())
+    popt, pcov = curve_fit(model_func, x_data, y_data)
+    a_fit, b_fit = popt
+    return a_fit, b_fit
