@@ -131,8 +131,9 @@ def split_into_phonemes(text: str) -> List[str]:
             # Get phonemes for the word
             phonemes = pronouncing.phones_for_word(word)
             # Split the phonemes into individual phonemes and append to the result list
-            for phoneme in phonemes:
-                phonemes_list.append(phoneme.split())
+            if phonemes:
+                for phoneme in phonemes:
+                    phonemes_list.append(phoneme.split())
 
     # Merge the phonemes into a single list
     merged_phonemes = sum(phonemes_list, [])
