@@ -1,4 +1,6 @@
 import logging
+import math
+
 import numpy as np
 from nltk.probability import FreqDist
 from typing import List
@@ -58,3 +60,103 @@ def normalize(time_series: List[int]) -> List[float]:
     sigma = np.sqrt(np.mean(np.dot(time_series, time_series) - mean_value * mean_value))
     normalized_time_series = (time_series - mean_value) / sigma
     return normalized_time_series
+
+
+def calculate_cumulative_means(time_series: List[int]) -> {List[int], List[float]}:
+    """
+    :param time_series:
+    :return:
+    """
+    cumulative_means = []
+    i = []
+    sum_so_far = 0
+    for ii, num in enumerate(time_series, 1):
+        sum_so_far += num
+        mean_so_far = sum_so_far / ii
+        cumulative_means.append(mean_so_far)
+        i.append(ii)
+    return i, cumulative_means
+
+
+def calculate_cumulative_variances(time_series: List[int]) -> {List[int], List[float]}:
+    """
+    :param time_series:
+    :return:
+    """
+    n = len(time_series)
+    cumulative_variances = []
+    i = []
+    sum_so_far = 0
+    sum_squared_so_far = 0
+
+    for ii, num in enumerate(time_series, 1):
+        sum_so_far += num
+        sum_squared_so_far += num ** 2
+
+        mean_so_far = sum_so_far / ii
+        sum_squared_so_far += (num - mean_so_far) ** 2
+        variance_so_far = sum_squared_so_far / ii
+
+        cumulative_variances.append(variance_so_far)
+        i.append(ii)
+
+    return i, cumulative_variances
+
+
+def calculate_cumulative_skewness(time_series: List[int]) -> {List[int], List[float]}:
+    """
+    :param time_series:
+    :return:
+    """
+    n = len(time_series)
+    cumulative_skewness = []
+    i = []
+    sum_so_far = 0
+    sum_squared_so_far = 0
+    sum_cubed_so_far = 0
+
+    for ii, num in enumerate(time_series, 1):
+        sum_so_far += num
+        mean_so_far = sum_so_far / ii
+        sum_squared_so_far += (num - mean_so_far) ** 2
+        sum_cubed_so_far += (num - mean_so_far) ** 3
+
+        if ii < 3:  # Handling for cases with fewer than 3 elements
+            skewness_so_far = 0
+        else:
+            skewness_so_far = (sum_cubed_so_far / ii) / math.pow(sum_squared_so_far / ii, 3 / 2)
+
+        cumulative_skewness.append(skewness_so_far)
+        i.append(ii)
+
+    return i, cumulative_skewness
+
+
+def calculate_cumulative_kurtosis(time_series: List[int]) -> {List[int], List[float]}:
+    """
+    :param time_series:
+    :return:
+    """
+    n = len(time_series)
+    cumulative_kurtosis = []
+    i = []
+
+    sum_so_far = 0
+    sum_squared_so_far = 0
+    sum_quartic_so_far = 0
+
+    for ii, num in enumerate(time_series, 1):
+        sum_so_far += num
+        mean_so_far = sum_so_far / ii
+        sum_squared_so_far += (num - mean_so_far) ** 2
+        sum_quartic_so_far += (num - mean_so_far) ** 4
+
+        if ii < 3:  # Handling for cases with fewer than 3 elements
+            kurtosis_so_far = 0
+        else:
+            kurtosis_so_far = (sum_quartic_so_far / ii) / (sum_squared_so_far / ii) ** 2 - 3
+
+        cumulative_kurtosis.append(kurtosis_so_far)
+        i.append(ii)
+
+    return i, cumulative_kurtosis
