@@ -15,15 +15,17 @@ def divide_into_segments(data: List[float], segment_size: int) -> List[List[floa
     return segments
 
 
-def calculate_local_trend(segment: List[float]) -> List[float]:
+def calculate_local_trend_order_n(segment: List[float], n: int = 1) -> List[float]:
     """
+    :param n:
     :param segment:
     :return:
     """
     x = np.arange(len(segment))
-    slope, intercept, _, _, _ = linregress(x, segment)
-    trend_line = slope * x + intercept
-    return trend_line
+    coefficients = np.polyfit(x, segment, n)
+    poly_function = np.poly1d(coefficients)
+    fit_values = poly_function(x)
+    return fit_values
 
 
 def dfa_process_single_segment(segment: List[float]) -> {float, float, float}:
@@ -31,7 +33,7 @@ def dfa_process_single_segment(segment: List[float]) -> {float, float, float}:
     :param segment:
     :return:
     """
-    trend_line = calculate_local_trend(segment)
+    trend_line = calculate_local_trend_order_n(segment, 3)
     detrended_segment = segment - trend_line
     segment_size = len(segment)
     variance = (1 / segment_size) * np.sum(detrended_segment ** 2)
@@ -148,7 +150,7 @@ def plot_segments(original_time_series: List[int], segments: List[List[float]], 
     len_segment_flattened = len(segments_flattened)
     x_axis = list(range(0, len_segment_flattened))
 
-    fig, axs = plt.subplots(3) # TODO podpisac osie
+    fig, axs = plt.subplots(3)  # TODO podpisac osie
 
     axs[0].scatter(x_axis, original_time_series[0:len_segment_flattened])
     axs[0].set_title('Time series')
@@ -159,7 +161,7 @@ def plot_segments(original_time_series: List[int], segments: List[List[float]], 
     no_segments = len(segments)
 
     for i in np.arange(no_segments):
-        axs[1].plot(x_axis[i*segment_size: (i+1)*segment_size], trend_lines[i], color='red')
+        axs[1].plot(x_axis[i * segment_size: (i + 1) * segment_size], trend_lines[i], color='red')
 
     axs[1].set_title('Integrated time series with trend')
 
@@ -168,4 +170,3 @@ def plot_segments(original_time_series: List[int], segments: List[List[float]], 
 
     plt.tight_layout()
     plt.show()
-
