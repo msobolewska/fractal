@@ -4,6 +4,7 @@ import math
 import numpy as np
 from nltk.probability import FreqDist
 from typing import List
+import random
 
 logger = logging.getLogger(__name__)
 
@@ -60,6 +61,18 @@ def normalize(time_series: List[int]) -> List[float]:
     sigma = np.sqrt(np.mean(np.dot(time_series, time_series) - mean_value * mean_value))
     normalized_time_series = (time_series - mean_value) / sigma
     return normalized_time_series
+
+
+def shuffle(time_series: List[float]) -> List[float]:
+    """
+    :param time_series:
+    :return:
+    """
+    series_length = len(time_series)
+    indices = list(range(series_length))
+    random.shuffle(indices)
+    time_series_shuffled = [time_series[i] for i in indices]
+    return time_series_shuffled
 
 
 def calculate_cumulative_means(time_series: List[int]) -> {List[int], List[float]}:
