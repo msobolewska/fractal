@@ -94,24 +94,29 @@ def get_h_from_fluctuations(segment_sizes: List[int], dfa_fluctuations: List[flo
     log_segment_values = np.log(segment_sizes)
     log_F_values = np.log(dfa_fluctuations)
 
+    if len(log_segment_values) == 0:
+        print(f'returning None from get_h_from_fluctuations, segment_sizes: {segment_sizes}, log_segment_values: {log_segment_values}')
+        return None
+
     slope, intercept, _, _, _ = linregress(log_segment_values, log_F_values)
 
     #TODO move it to the print method
     regression_line = slope * log_segment_values + intercept
 
     # Plot data and regression line
-    plt.scatter(log_segment_values, log_F_values, label='Data')
-    plt.plot(log_segment_values, regression_line, color='red', label='Regression Line')
-    plt.xlabel('X')
-    plt.ylabel('Y')
-    plt.title('Linear Regression')
-    plt.legend()
-    plt.grid(True)
-    plt.show()
+    #plt.scatter(log_segment_values, log_F_values, label='Data')
+    #plt.plot(log_segment_values, regression_line, color='red', label='Regression Line')
+    #plt.xlabel('Log(s)')
+    #plt.ylabel('Log(R/S)')
+    #plt.title('Linear Regression')
+    #plt.legend()
+    #plt.grid(True)
+    #plt.savefig('rra.png')
+    #plt.show()
 
     # Display slope and intercept
-    print("Slope:", slope)
-    print("Intercept:", intercept)
+    #print("Slope:", slope)
+    #print("Intercept:", intercept)
 
     estimated_h = slope
     return estimated_h
@@ -135,7 +140,8 @@ def perform_rra(X: List[int], ksi: List[float]) -> float:
         for tt in t:
             r_t_s = calc_cumulated_range(X, tt, ss)
             variance_squared = calc_variance_squared(tt, ss, ksi)
-            ratios_per_s.append(r_t_s / (np.sqrt(variance_squared)))
+            if variance_squared > 0:
+                ratios_per_s.append(r_t_s / (np.sqrt(variance_squared)))
         ratios.append(np.mean(ratios_per_s))
 
     estimated_a = get_h_from_fluctuations(s, ratios)
