@@ -135,7 +135,7 @@ def model_func(x, a, b, c):
     :param c:
     :return:
     """
-    return a * pow(x, -b) * np.exp(-c * np.log(x))
+    return a * pow(x, -b) * np.exp(-c * x)
 
 
 def model_func_truncated(x, a, b):
