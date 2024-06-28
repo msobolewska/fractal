@@ -127,7 +127,18 @@ def print_sorted(dict_in: {}) -> None:
         print(f"{key}\t{value}")
 
 
-def model_func(x, a, b):
+def model_func(x, a, b, c):
+    """
+    :param x:
+    :param a:
+    :param b:
+    :param c:
+    :return:
+    """
+    return a * pow(x, -b) * np.exp(-c * np.log(x))
+
+
+def model_func_truncated(x, a, b):
     """
     :param x:
     :param a:
@@ -137,13 +148,25 @@ def model_func(x, a, b):
     return a * pow(x, -b)
 
 
-def find_A_b_numerically(X_Y: {}) -> {float, float}:
+def find_A_b_numerically_truncated(X_Y: {}) -> {float, float}:
     """
     :param X_Y:
     :return:
     """
     x_data = list(X_Y.keys())
     y_data = list(X_Y.values())
-    popt, pcov = curve_fit(model_func, x_data, y_data)
+    popt, pcov = curve_fit(model_func_truncated, x_data, y_data, bounds=([1e-6, 1e-6], [np.inf, np.inf]))
     a_fit, b_fit = popt
     return a_fit, b_fit
+
+
+def find_A_b_numerically_full(X_Y: {}) -> {float, float, float}:
+    """
+    :param X_Y:
+    :return:
+    """
+    x_data = list(X_Y.keys())
+    y_data = list(X_Y.values())
+    popt, pcov = curve_fit(model_func, x_data, y_data, bounds=([1e-6, 1e-6, 1e-6], [np.inf, np.inf, np.inf]))
+    a_fit, b_fit, c_fit = popt
+    return a_fit, b_fit, c_fit
