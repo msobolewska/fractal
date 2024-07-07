@@ -11,6 +11,8 @@ def divide_into_segments(data: List[float], segment_size: int) -> List[List[floa
     :return:
     """
     num_segments = len(data) // segment_size
+    if len(data) % segment_size != 0:
+        num_segments += 1
     segments = np.array_split(data, num_segments)
     return segments
 
@@ -33,7 +35,7 @@ def dfa_process_single_segment(segment: List[float]) -> {float, float, float}:
     :param segment:
     :return:
     """
-    trend_line = calculate_local_trend_order_n(segment, 3)
+    trend_line = calculate_local_trend_order_n(segment, 2)
     detrended_segment = segment - trend_line
     segment_size = len(segment)
     variance = (1 / segment_size) * np.sum(detrended_segment ** 2)
@@ -154,6 +156,8 @@ def plot_segments(original_time_series: List[int], segments: List[List[float]], 
 
     axs[0].scatter(x_axis, original_time_series[0:len_segment_flattened])
     axs[0].set_title('Time series')
+    axs[0].set_xlabel('t')
+    axs[0].set_ylabel('u_t')
 
     axs[1].scatter(x_axis, segments_flattened)
 
@@ -164,9 +168,14 @@ def plot_segments(original_time_series: List[int], segments: List[List[float]], 
         axs[1].plot(x_axis[i * segment_size: (i + 1) * segment_size], trend_lines[i], color='red')
 
     axs[1].set_title('Integrated time series with trend')
+    axs[1].set_xlabel('t')
+    axs[1].set_ylabel('Y(t)')
 
     axs[2].scatter(x_axis, detrended_segments[0:len_segment_flattened])
     axs[2].set_title('Detrended time series')
+    axs[2].set_xlabel('t')
+    axs[2].set_ylabel('Y(t)')
 
     plt.tight_layout()
+    plt.savefig('dfa.png')
     plt.show()

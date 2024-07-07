@@ -106,13 +106,23 @@ def perform_afa(integrated_time_series: List[int],
     """
 
     afa_fluctuations = []
+    ws_nona = []  # store lengths that return non-nan; nan occurs for example when length of segments is greater that
+    # actual list length
 
     for ii, w in enumerate(ws):
         average_var_fluctuation = afa_process_single_segment_size(integrated_time_series,
                                                                   w)
-        afa_fluctuations.append(average_var_fluctuation)
+        if not np.isnan(average_var_fluctuation):
+            afa_fluctuations.append(average_var_fluctuation)
+            ws_nona.append(w)
+        else:
+            print(f' NaN encountered for segment length: {w}')
 
-    estimated_a = get_h_from_fluctuations(ws, afa_fluctuations)
+    if len(afa_fluctuations) == 0:
+        print(f'No non-nans encountered for segment')
+        return np.nan
+    #print(f' afa_fluctuations: {afa_fluctuations}')
+    estimated_a = get_h_from_fluctuations(ws_nona, afa_fluctuations)
     return estimated_a
 
 
@@ -142,6 +152,8 @@ def plot_segments_x(original_time_series: List[int], integrated_time_series: Lis
 
     axs[0].scatter(x_axis, original_time_series[0:len_segments_nonoverlapped])
     axs[0].set_title('Time series')
+    axs[0].set_xlabel('t')
+    axs[0].set_ylabel('u_t')
 
     axs[1].scatter(x_axis, integrated_time_series[0:len_segments_nonoverlapped])
 
@@ -149,8 +161,10 @@ def plot_segments_x(original_time_series: List[int], integrated_time_series: Lis
 
     # TODO make it more general, so x is used
     axs[1].plot(x_axis[0: w], np.poly1d(coefficients[0])(xx), color='red')
-    axs[1].plot(x_axis[w - overlap: 2 * w - overlap], np.poly1d(coefficients[1])(xx), color='yellow')
+    axs[1].plot(x_axis[w - overlap: 2 * w - overlap], np.poly1d(coefficients[1])(xx), color='green')
     axs[1].plot(x_axis[2 * w - 2 * overlap: 3 * w - 2 * overlap], np.poly1d(coefficients[2])(xx), color='red')
+    axs[1].set_xlabel('t')
+    axs[1].set_ylabel('Y(t)')
 
     axs[1].set_title('Integrated time series with trend')
 
@@ -159,6 +173,9 @@ def plot_segments_x(original_time_series: List[int], integrated_time_series: Lis
     axs[2].scatter(x_axis, integrated_time_series[0:len_segments_nonoverlapped])
     axs[2].plot(x_axis, global_trend[0:len_segments_nonoverlapped], color='red')
     axs[2].set_title('Global trend')
+    axs[2].set_xlabel('t')
+    axs[2].set_ylabel('Y(t)')
 
     plt.tight_layout()
+    plt.savefig("afa.png")
     plt.show()
